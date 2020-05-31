@@ -1,11 +1,35 @@
-const express = require("express");
+require('dotenv').config()
+
+const express = require("express"),
+      massive = require('massive'),
+      ctrl = require('controller'),
+      { SERVER_PORT, CONNECTION_STRING } = process.env,
+      port = SERVER_PORT,
 
 const app = express();
 
-const { SERVER_PORT } = process.env;
+massive({
+  connectionString: CONNECTION_STRING,
+  ssl: {rejectUnauthorized: false}
+})
+.then(db => {
+  app.set('db', db)
+
+  // db.new_planes()
+  //   .then(planes => console.log(planes))
+  //   .catch( err => console.log( err ))
+
+  // db.get_planes()
+  // .then(planes => console.log(planes))
+  // .catch(err => console.log(err))
+
+  // console.log('db connected')
+})
 
 app.use(express.json());
 
-app.listen(SERVER_PORT, () => {
-  console.log(`Server listening on port ${SERVER_PORT}`);
+app.get('/api/planes', ctrl.getPlanes)
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
 });
